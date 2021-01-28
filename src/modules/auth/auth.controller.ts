@@ -1,6 +1,6 @@
 import { ApiResult } from './../../base/ApiResult';
 import { MyLogger } from './../logger/my-logger.service';
-import { Controller, Post, UseGuards, Request, Body } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { AuthenticationDTO } from './dto/authen.dto';

@@ -41,7 +41,7 @@ export class UserService {
   async updateOtp(userId, otpId) {
     try {
       const user = await this.userRepository.findOne({ id: userId });
-      user.otp_id = otpId;
+      user.otpId = otpId;
       this.userRepository.save(user);
     } catch (error) {
       this.myLogger.error(error);

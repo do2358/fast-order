@@ -1,4 +1,3 @@
-import { MyLogger } from './../logger/my-logger.service';
 import { LoggerModule } from './../logger/logger.module';
 import { StoreEmployeeEntity } from './entity/store-employee.enity';
 import { StoreEntity } from './entity/store.enity';

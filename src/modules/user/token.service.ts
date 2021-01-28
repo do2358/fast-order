@@ -19,13 +19,13 @@ export class TokenService {
     this.myLogger.setContext(TokenService.name);
   }
 
-  createTokenUser(employeeId, token) {
+  async createTokenUser(employeeId, token) {
     try {
       const tokenEntity = new TokenEntity();
       tokenEntity.token = token;
-      tokenEntity.employeeeId = employeeId;
+      tokenEntity.employeeId = employeeId;
       this.tokenRepository.create(tokenEntity);
-      this.tokenRepository.save(tokenEntity);
+      await this.tokenRepository.save(tokenEntity);
     } catch (error) {
       this.myLogger.error(error);
       AppException.throwBusinessException(ErrorCode.ERR_40001());
@@ -35,11 +35,11 @@ export class TokenService {
   async updateTokenUser(employeeId, token) {
     try {
       const tokenEntity = await this.tokenRepository.findOne({
-        employeeeId: employeeId,
+        employeeId: employeeId,
       });
       this.myLogger.log('===> Update token for user: ' + tokenEntity);
       tokenEntity.token = token;
-      this.tokenRepository.save(tokenEntity);
+      await this.tokenRepository.save(tokenEntity);
     } catch (error) {
       this.myLogger.error(error);
       AppException.throwBusinessException(ErrorCode.ERR_40001());
@@ -65,7 +65,7 @@ export class TokenService {
         if (
           !tokenData ||
           tokenData.exp * 1000 <= current ||
-          tokenData.employeeId !== tokenModel.employeeeId
+          tokenData.employeeId !== tokenModel.employeeId
         ) {
           result = null;
         } else {

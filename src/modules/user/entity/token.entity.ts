@@ -9,5 +9,5 @@ export class TokenEntity extends BaseEntity {
   token: string;
 
   @Column({ name: 'employee_id' })
-  employeeeId: string;
+  employeeId: string;
 }
