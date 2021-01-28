@@ -5,6 +5,7 @@ import {
 } from './../../../constants/AppConfig';
 import { Column, Entity } from 'typeorm';
 import { BaseEntity } from './../../../base/BaseEntity';
+import { EmployeeRole } from 'src/constants/EmplyeeContant';
 
 @Entity({
   name: 'tb_user',
@@ -19,12 +20,12 @@ export class UserEntity extends BaseEntity {
   @Column({ name: 'is_delete', type: 'int', default: DELETE_STATUS.NO })
   isDelete: number;
 
-  @Column({ name: 'account_type', type: 'int', default: 1 })
+  @Column({ name: 'account_type', type: 'int', default: EmployeeRole.OWNER })
   accountType: number;
 
   @Column({ name: 'disable', type: 'int', default: STATUS.ENABLE })
   disable: number;
 
   @Column({ name: 'otp_id', nullable: true })
-  otp_id: string;
+  otpId: string;
 }

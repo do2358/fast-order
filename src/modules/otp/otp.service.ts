@@ -1,17 +1,13 @@
 import { ErrorCode } from 'src/constants/ErrorCode';
 import { AppException } from './../../exception/app.exception';
-import {
-  EMPLOYEE_TYPE,
-  VERIFY_STATUS,
-  OTP_IS_USE,
-} from './../../constants/AppConfig';
+import { EMPLOYEE_TYPE, VERIFY_STATUS } from './../../constants/AppConfig';
 import { OtpDTO } from './dto/authen.dto';
 import { UserService } from './../user/user.service';
 import { OtpEntity } from './enity/otp.entity';
 import { MyLogger } from './../logger/my-logger.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Timestamp } from 'typeorm';
+import { Repository } from 'typeorm';
 import { getExpire, randomOtp } from 'src/util/CommandUtils';
 
 @Injectable()
@@ -50,17 +46,17 @@ export class OtpService {
     if (typeEmployee !== EMPLOYEE_TYPE.OWNER) {
       AppException.throwBusinessException(ErrorCode.ERR_30003());
     }
-    const userEntiy = await this.userService.findById(id);
-    if (!userEntiy) {
+    const userEntity = await this.userService.findById(id);
+    if (!userEntity) {
       AppException.throwBusinessException(ErrorCode.ERR_30004());
     }
-    if (!userEntiy.otp_id || userEntiy.otp_id === null) {
+    if (!userEntity.otpId || userEntity.otpId === null) {
       AppException.throwBusinessException(ErrorCode.ERR_20201());
     }
-    if (userEntiy.isVerify === VERIFY_STATUS.YES) {
+    if (userEntity.isVerify === VERIFY_STATUS.YES) {
       AppException.throwBusinessException(ErrorCode.ERR_20202());
     }
-    const otpEntity = await this.otpRepository.findOne(userEntiy.otp_id);
+    const otpEntity = await this.otpRepository.findOne(userEntity.otpId);
     if (otpEntity.exprie.getTime() <= date.getTime()) {
       AppException.throwBusinessException(ErrorCode.ERR_20203());
     }

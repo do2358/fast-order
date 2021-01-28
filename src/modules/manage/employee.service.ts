@@ -5,6 +5,7 @@ import { MyLogger } from './../logger/my-logger.service';
 import { Repository } from 'typeorm';
 import { EmployeeEntity } from './entity/employee.entity';
 import { Injectable } from '@nestjs/common';
+import { EmployeeRole } from 'src/constants/EmplyeeContant';
 
 @Injectable()
 export class EmployeeService {
@@ -16,7 +17,7 @@ export class EmployeeService {
     this.myLogger.setContext(EmployeeService.name);
   }
 
-  async createOwnerEmployeee(
+  async createOwnerEmployee(
     phone: string,
     userId: string,
   ): Promise<EmployeeEntity> {
@@ -24,7 +25,7 @@ export class EmployeeService {
       const employeeEntity = new EmployeeEntity();
       employeeEntity.username = phone;
       employeeEntity.displayName = phone;
-      employeeEntity.type = 1;
+      employeeEntity.type = EmployeeRole.OWNER;
       employeeEntity.userId = userId;
       console.log(JSON.stringify(employeeEntity));
       const newEntity = this.employeeRepository.create(employeeEntity);
@@ -40,7 +41,7 @@ export class EmployeeService {
     try {
       const employeeEntity = await this.employeeRepository.findOne({
         userId: userId,
-        type: 1,
+        type: EmployeeRole.OWNER,
       });
       return employeeEntity;
     } catch (error) {

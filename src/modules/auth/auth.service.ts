@@ -28,33 +28,34 @@ export class AuthService {
     const user = await this.userService.findByPhone(authenRequest.phone);
     if (!user) {
       const newUser = await this.userService.createByPhone(authenRequest.phone);
-      const newEmployeee = await this.employeeService.createOwnerEmployeee(
+      const newEmployee = await this.employeeService.createOwnerEmployee(
         authenRequest.phone,
         newUser.id,
       );
       const token = this.jwtService.sign(
         {
-          employeeId: newEmployeee.id,
+          employeeId: newEmployee.id,
           userId: newUser.id,
-          type: newEmployeee.type,
+          type: newEmployee.type,
         },
         {
           expiresIn: '1d',
         },
       );
       await Promise.all([
-        this.tokenService.createTokenUser(newEmployeee.id, token),
+        this.tokenService.createTokenUser(newEmployee.id, token),
         this.otpService.sendOtp(newUser.id, newUser.phone),
       ]);
-      delete newUser.otp_id;
+      delete newUser.otpId;
       return new LoginResponse(token, newUser);
     }
-    const employeee = await this.employeeService.findOwnerEmployee(user.id);
+
+    const employee = await this.employeeService.findOwnerEmployee(user.id);
     const token = this.jwtService.sign(
       {
-        employeeId: employeee.id,
+        employeeId: employee.id,
         userId: user.id,
-        type: employeee.type,
+        type: employee.type,
       },
       {
         expiresIn: '1d',
@@ -63,11 +64,11 @@ export class AuthService {
     if (user.disable === STATUS.DISABLE) {
       AppException.throwBusinessException(ErrorCode.ERR_20102());
     }
-    await this.tokenService.updateTokenUser(employeee.id, token);
+    await this.tokenService.updateTokenUser(employee.id, token);
     if (user.isVerify === VERIFY_STATUS.NO) {
       await this.otpService.sendOtp(user.id, user.phone);
     }
-    delete user.otp_id;
+    delete user.otpId;
     return new LoginResponse(token, user);
   }
 }

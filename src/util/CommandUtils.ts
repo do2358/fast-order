@@ -11,6 +11,6 @@ export function randomOtp(): string {
   return otp;
 }
 
-export function getExpire(date: Date, minutes): Date {
+export function getExpire(date: Date, minutes = 0): Date {
   return new Date(date.getTime() + minutes * 60000);
 }
