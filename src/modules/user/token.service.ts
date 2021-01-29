@@ -47,7 +47,6 @@ export class TokenService {
   }
 
   async decodeToken(token) {
-    console.log(token);
     const current = new Date().getTime();
     const tokenModel = await this.tokenRepository.findOne({
       token: token,
@@ -61,7 +60,6 @@ export class TokenService {
           type: number;
           employeeId: string;
         };
-        console.log(tokenData);
         if (
           !tokenData ||
           tokenData.exp * 1000 <= current ||
@@ -79,7 +77,6 @@ export class TokenService {
         result = null;
       }
     }
-    console.log(result);
     return result;
   }
 }

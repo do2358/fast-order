@@ -1,7 +1,7 @@
 import { ErrorCode } from 'src/constants/ErrorCode';
 import { AppException } from './../../exception/app.exception';
 import { EMPLOYEE_TYPE, VERIFY_STATUS } from './../../constants/AppConfig';
-import { OtpDTO } from './dto/authen.dto';
+import { OtpDTO } from './dto/otp.dto';
 import { UserService } from './../user/user.service';
 import { OtpEntity } from './enity/otp.entity';
 import { MyLogger } from './../logger/my-logger.service';
@@ -65,5 +65,36 @@ export class OtpService {
     }
     await this.userService.verifyOtpSuccess(id);
     return true;
+  }
+
+  async resendOtp(id: string, typeEmployee: number) {
+    try {
+      if (typeEmployee !== EMPLOYEE_TYPE.OWNER) {
+        AppException.throwBusinessException(ErrorCode.ERR_30003());
+      }
+      const userEntity = await this.userService.findById(id);
+      if (!userEntity) {
+        AppException.throwBusinessException(ErrorCode.ERR_30004());
+      }
+      if (userEntity.isVerify === VERIFY_STATUS.YES) {
+        AppException.throwBusinessException(ErrorCode.ERR_20202());
+      }
+      const otp = randomOtp();
+      this.myLogger.log('resend otp ==> ' + userEntity.phone + ' ' + otp);
+      const otpEntity = new OtpEntity();
+      otpEntity.phone = userEntity.phone;
+      otpEntity.otp = otp;
+      const now = new Date();
+      const timeExpire = getExpire(now, 5);
+      otpEntity.exprie = timeExpire;
+      const newOtp = this.otpRepository.create(otpEntity);
+      await this.otpRepository.save(newOtp);
+      await this.userService.updateOtp(id, newOtp.id);
+      return true;
+    } catch (error) {
+      this.myLogger.log(
+        `===> error resend otp with id=${id}: ${JSON.stringify(error)}`,
+      );
+    }
   }
 }
