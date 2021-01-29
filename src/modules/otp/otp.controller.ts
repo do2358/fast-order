@@ -1,11 +1,11 @@
 import { ApiResult } from './../../base/ApiResult';
 import { OtpService } from './otp.service';
 import { MyLogger } from './../logger/my-logger.service';
-import { OtpDTO } from './dto/authen.dto';
 import { FOAuthGuard } from './../../security/authorization.guard';
 import { Body, Controller, Post, UseGuards, Headers } from '@nestjs/common';
 import { Authorization } from 'src/security/authorization.decorator';
 import { ApiTags } from '@nestjs/swagger';
+import { OtpDTO } from './dto/otp.dto';
 
 @Controller('otp')
 @ApiTags('Otp')
@@ -31,5 +31,19 @@ export class OtpController {
     );
     const result = await this.otpService.verifyOtp(id, typeEmployee, otpDto);
     return ApiResult.SUCCESS(result, 'Xác thực OTP thành công');
+  }
+
+  @Authorization(true)
+  @UseGuards(FOAuthGuard)
+  @Post('resend-otp')
+  async resendOtp(
+    @Headers('user_id') id: string,
+    @Headers('type') typeEmployee: number,
+  ) {
+    this.myLogger.log(
+      '===> before resend otp  id=' + id + ' type=' + typeEmployee,
+    );
+    const result = await this.otpService.resendOtp(id, typeEmployee);
+    return ApiResult.SUCCESS(result, 'Resend OTP thành công');
   }
 }
