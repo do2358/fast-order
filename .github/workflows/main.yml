@@ -37,8 +37,8 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: garygrossgarten/github-action-scp@release
         with:
-          local: build
-          remote: scp/directory
+          local: dist
+          remote: /home/fast-order/dist
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.PASSWORD }}
