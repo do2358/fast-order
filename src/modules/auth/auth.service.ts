@@ -35,7 +35,7 @@ export class AuthService {
     if (!user) {
       const newUser = await this.userService.createByPhone(authenRequest.phone);
       await this.otpService.sendOtp(newUser.id, newUser.phone);
-      return new AuthByPhoneResponse(true, false);
+      return new AuthByPhoneResponse(false, false);
     }
     if (user.disable === STATUS.DISABLE) {
       AppException.throwBusinessException(ErrorCode.ERR_20102());
