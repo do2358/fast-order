@@ -69,32 +69,24 @@ export class OtpService {
   }
 
   async resendOtp(sendOtpDTO: SendOtpDTO) {
-    try {
-      const userEntity = await this.userService.findByPhone(sendOtpDTO.phone);
-      if (!userEntity) {
-        AppException.throwBusinessException(ErrorCode.ERR_30004());
-      }
-      if (userEntity.isVerify === VERIFY_STATUS.YES) {
-        AppException.throwBusinessException(ErrorCode.ERR_20202());
-      }
-      const otp = randomOtp();
-      this.myLogger.log('resend otp ==> ' + userEntity.phone + ' ' + otp);
-      const otpEntity = new OtpEntity();
-      otpEntity.phone = userEntity.phone;
-      otpEntity.otp = otp;
-      const now = new Date();
-      const timeExpire = getExpire(now, 5);
-      otpEntity.exprie = timeExpire;
-      const newOtp = this.otpRepository.create(otpEntity);
-      await this.otpRepository.save(newOtp);
-      await this.userService.updateOtp(userEntity.id, newOtp.id);
-      return true;
-    } catch (error) {
-      this.myLogger.log(
-        `===> error resend otp with phone=${sendOtpDTO.phone}: ${JSON.stringify(
-          error,
-        )}`,
-      );
+    const userEntity = await this.userService.findByPhone(sendOtpDTO.phone);
+    if (!userEntity) {
+      AppException.throwBusinessException(ErrorCode.ERR_30004());
     }
+    if (userEntity.isVerify === VERIFY_STATUS.YES) {
+      AppException.throwBusinessException(ErrorCode.ERR_20202());
+    }
+    const otp = randomOtp();
+    this.myLogger.log('resend otp ==> ' + userEntity.phone + ' ' + otp);
+    const otpEntity = new OtpEntity();
+    otpEntity.phone = userEntity.phone;
+    otpEntity.otp = otp;
+    const now = new Date();
+    const timeExpire = getExpire(now, 5);
+    otpEntity.exprie = timeExpire;
+    const newOtp = this.otpRepository.create(otpEntity);
+    await this.otpRepository.save(newOtp);
+    await this.userService.updateOtp(userEntity.id, newOtp.id);
+    return true;
   }
 }

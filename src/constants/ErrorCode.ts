@@ -44,6 +44,15 @@ export class ErrorCode {
   public static ERR_20205() {
     return { code: 20205, message: 'Mã OTP xác thực không chinh xác' };
   }
+  public static ERR_20301() {
+    return { code: 20301, message: 'Số điện thoại nhập không đúng định dạng' };
+  }
+  public static ERR_20302() {
+    return { code: 20302, message: 'Mật khẩu phải gồm 6 kí tự' };
+  }
+  public static ERR_20303() {
+    return { code: 20303, message: 'Tài khoản đã được tạo. Vui lòng thử lại' };
+  }
   public static ERR_30001() {
     return { code: 300001, message: 'Sai tài khoản hoặc mật khẩu' };
   }

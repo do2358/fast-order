@@ -1,9 +1,12 @@
+import { EmployeeEntity } from './../../manage/entity/employee.entity';
 import { UserEntity } from './../../user/entity/user.entity';
 export class LoginResponse {
   token: string;
-  user: UserEntity;
-  constructor(token: string, userEntity: UserEntity) {
+  employee: EmployeeEntity;
+  userInfo: UserEntity;
+  constructor(token: string, userInfo: UserEntity, employee: EmployeeEntity) {
     this.token = token;
-    this.user = userEntity;
+    this.employee = employee;
+    this.userInfo = userInfo;
   }
 }
