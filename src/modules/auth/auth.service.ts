@@ -1,3 +1,4 @@
+import { LoginDTO } from './dto/login.dto';
 import { CreateEmployeeOwnerDTO } from './dto/create-employee-owner.dto';
 import { MyLogger } from './../logger/my-logger.service';
 import { AuthByPhoneResponse } from './response/auth-byphone.response';
@@ -83,5 +84,34 @@ export class AuthService {
     delete user.isDelete;
     delete user.deletedAt;
     return new LoginResponse(token, user, newEmployee);
+  }
+
+  async login(loginDTO: LoginDTO) {
+    if (!validatePhone(loginDTO.phone)) {
+      AppException.throwBusinessException(ErrorCode.ERR_20301());
+    }
+    if (!validateLengthPwd(loginDTO.password)) {
+      AppException.throwBusinessException(ErrorCode.ERR_20302());
+    }
+    const user = await this.userService.findByPhone(loginDTO.phone);
+    const employee = await this.employeeService.findOwnerEmployee(user.id);
+    if (!employee) {
+      AppException.throwBusinessException(ErrorCode.ERR_30001());
+    }
+    const token = this.jwtService.sign(
+      {
+        employeeId: employee.id,
+        userId: user.id,
+        type: employee.type,
+      },
+      {
+        expiresIn: '1d',
+      },
+    );
+    await this.tokenService.createTokenUser(employee.id, token);
+    delete user.otpId;
+    delete user.isDelete;
+    delete user.deletedAt;
+    return new LoginResponse(token, user, employee);
   }
 }
