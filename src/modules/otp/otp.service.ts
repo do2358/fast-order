@@ -1,3 +1,4 @@
+import { SendOtpDTO } from './dto/send-otp.dto';
 import { ErrorCode } from 'src/constants/ErrorCode';
 import { AppException } from './../../exception/app.exception';
 import { EMPLOYEE_TYPE, VERIFY_STATUS } from './../../constants/AppConfig';
@@ -41,12 +42,12 @@ export class OtpService {
     }
   }
 
-  async verifyOtp(id: string, typeEmployee: number, otpDto: OtpDTO) {
+  async verifyOtp(otpDto: OtpDTO) {
     const date = new Date();
-    if (typeEmployee !== EMPLOYEE_TYPE.OWNER) {
-      AppException.throwBusinessException(ErrorCode.ERR_30003());
-    }
-    const userEntity = await this.userService.findById(id);
+    // if (typeEmployee !== EMPLOYEE_TYPE.OWNER) {
+    //   AppException.throwBusinessException(ErrorCode.ERR_30003());
+    // }
+    const userEntity = await this.userService.findByPhone(otpDto.phone);
     if (!userEntity) {
       AppException.throwBusinessException(ErrorCode.ERR_30004());
     }
@@ -63,16 +64,13 @@ export class OtpService {
     if (otpEntity.otp !== otpDto.otp) {
       AppException.throwBusinessException(ErrorCode.ERR_20205());
     }
-    await this.userService.verifyOtpSuccess(id);
+    await this.userService.verifyOtpSuccess(userEntity.id);
     return true;
   }
 
-  async resendOtp(id: string, typeEmployee: number) {
+  async resendOtp(sendOtpDTO: SendOtpDTO) {
     try {
-      if (typeEmployee !== EMPLOYEE_TYPE.OWNER) {
-        AppException.throwBusinessException(ErrorCode.ERR_30003());
-      }
-      const userEntity = await this.userService.findById(id);
+      const userEntity = await this.userService.findByPhone(sendOtpDTO.phone);
       if (!userEntity) {
         AppException.throwBusinessException(ErrorCode.ERR_30004());
       }
@@ -89,11 +87,13 @@ export class OtpService {
       otpEntity.exprie = timeExpire;
       const newOtp = this.otpRepository.create(otpEntity);
       await this.otpRepository.save(newOtp);
-      await this.userService.updateOtp(id, newOtp.id);
+      await this.userService.updateOtp(userEntity.id, newOtp.id);
       return true;
     } catch (error) {
       this.myLogger.log(
-        `===> error resend otp with id=${id}: ${JSON.stringify(error)}`,
+        `===> error resend otp with phone=${sendOtpDTO.phone}: ${JSON.stringify(
+          error,
+        )}`,
       );
     }
   }

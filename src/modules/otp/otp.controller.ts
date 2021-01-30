@@ -6,6 +6,8 @@ import { Body, Controller, Post, UseGuards, Headers } from '@nestjs/common';
 import { Authorization } from 'src/security/authorization.decorator';
 import { ApiTags } from '@nestjs/swagger';
 import { OtpDTO } from './dto/otp.dto';
+import { SendOtpDTO } from './dto/send-otp.dto';
+import { send } from 'process';
 
 @Controller('otp')
 @ApiTags('Otp')
@@ -13,37 +15,20 @@ export class OtpController {
   constructor(private myLogger: MyLogger, private otpService: OtpService) {
     this.myLogger.setContext(OtpController.name);
   }
-  @Authorization(true)
-  @UseGuards(FOAuthGuard)
+
   @Post('verify')
-  async verifyOtp(
-    @Headers('user_id') id: string,
-    @Headers('type') typeEmployee: number,
-    @Body() otpDto: OtpDTO,
-  ) {
-    this.myLogger.log(
-      '===> before verify otp  id=' +
-        id +
-        ' type=' +
-        typeEmployee +
-        ' otp=' +
-        JSON.stringify(otpDto),
-    );
-    const result = await this.otpService.verifyOtp(id, typeEmployee, otpDto);
+  async verifyOtp(@Body() otpDto: OtpDTO) {
+    this.myLogger.log('===> before verify otp=' + JSON.stringify(otpDto));
+    const result = await this.otpService.verifyOtp(otpDto);
     return ApiResult.SUCCESS(result, 'Xác thực OTP thành công');
   }
 
-  @Authorization(true)
-  @UseGuards(FOAuthGuard)
+  // @Authorization(true)
+  // @UseGuards(FOAuthGuard)
   @Post('resend-otp')
-  async resendOtp(
-    @Headers('user_id') id: string,
-    @Headers('type') typeEmployee: number,
-  ) {
-    this.myLogger.log(
-      '===> before resend otp  id=' + id + ' type=' + typeEmployee,
-    );
-    const result = await this.otpService.resendOtp(id, typeEmployee);
+  async reSendOtp(@Body() sendOtp: SendOtpDTO) {
+    this.myLogger.log('===> before verify otp=' + JSON.stringify(sendOtp));
+    const result = await this.otpService.resendOtp(sendOtp);
     return ApiResult.SUCCESS(result, 'Resend OTP thành công');
   }
 }
