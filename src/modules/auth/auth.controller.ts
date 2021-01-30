@@ -1,3 +1,4 @@
+import { LoginDTO } from './dto/login.dto';
 import { ApiResult } from './../../base/ApiResult';
 import { MyLogger } from './../logger/my-logger.service';
 import { Controller, Post, Body } from '@nestjs/common';
@@ -39,6 +40,15 @@ export class AuthController {
     this.myLogger.log(
       '===> create employee owner response: ' + JSON.stringify(data),
     );
+    return ApiResult.SUCCESS(data, 'Thành công');
+  }
+
+  @Post('login')
+  @ApiBody({ type: LoginDTO })
+  async login(@Body() body: LoginDTO): Promise<any> {
+    this.myLogger.log('===> login request: ' + JSON.stringify(body));
+    const data = await this.authService.login(body);
+    this.myLogger.log('===> login response: ' + JSON.stringify(data));
     return ApiResult.SUCCESS(data, 'Thành công');
   }
 }

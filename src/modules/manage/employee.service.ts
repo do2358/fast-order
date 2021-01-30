@@ -35,6 +35,9 @@ export class EmployeeService {
       const newEntity = this.employeeRepository.create(employeeEntity);
       await this.employeeRepository.save(newEntity);
       delete newEntity.password;
+      delete newEntity.isDelete;
+      delete newEntity.fcmToken;
+      delete newEntity.deletedAt;
       return newEntity;
     } catch (error) {
       this.myLogger.error(error);
@@ -48,6 +51,10 @@ export class EmployeeService {
         userId: userId,
         type: EmployeeRole.OWNER,
       });
+      delete employeeEntity.password;
+      delete employeeEntity.isDelete;
+      delete employeeEntity.fcmToken;
+      delete employeeEntity.deletedAt;
       return employeeEntity;
     } catch (error) {
       this.myLogger.error(error);
