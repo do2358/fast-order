@@ -1,3 +1,5 @@
+import { MyLogger } from './../logger/my-logger.service';
+import { AuthByPhoneResponse } from './response/auth-byphone.response';
 import { STATUS, VERIFY_STATUS } from './../../constants/AppConfig';
 import { LoginResponse } from './response/login.response';
 import { OtpService } from './../otp/otp.service';
@@ -10,6 +12,7 @@ import { AppException } from 'src/exception/app.exception';
 import { validatePhone } from 'src/util/ValidateUtils';
 import { UserService } from '../user/user.service';
 import { AuthenticationDTO } from './dto/authen.dto';
+import { use } from 'passport';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +22,7 @@ export class AuthService {
     private employeeService: EmployeeService,
     private tokenService: TokenService,
     private otpService: OtpService,
+    private logger: MyLogger,
   ) {}
 
   async authenticationByPhone(authenRequest: AuthenticationDTO) {
@@ -28,47 +32,17 @@ export class AuthService {
     const user = await this.userService.findByPhone(authenRequest.phone);
     if (!user) {
       const newUser = await this.userService.createByPhone(authenRequest.phone);
-      const newEmployee = await this.employeeService.createOwnerEmployee(
-        authenRequest.phone,
-        newUser.id,
-      );
-      const token = this.jwtService.sign(
-        {
-          employeeId: newEmployee.id,
-          userId: newUser.id,
-          type: newEmployee.type,
-        },
-        {
-          expiresIn: '1d',
-        },
-      );
-      await Promise.all([
-        this.tokenService.createTokenUser(newEmployee.id, token),
-        this.otpService.sendOtp(newUser.id, newUser.phone),
-      ]);
-      delete newUser.otpId;
-      return new LoginResponse(token, newUser);
+      await this.otpService.sendOtp(newUser.id, newUser.phone);
+      return new AuthByPhoneResponse(true, false);
     }
-
-    const employee = await this.employeeService.findOwnerEmployee(user.id);
-    const token = this.jwtService.sign(
-      {
-        employeeId: employee.id,
-        userId: user.id,
-        type: employee.type,
-      },
-      {
-        expiresIn: '1d',
-      },
-    );
-    if (user.disable === STATUS.DISABLE) {
-      AppException.throwBusinessException(ErrorCode.ERR_20102());
-    }
-    await this.tokenService.updateTokenUser(employee.id, token);
     if (user.isVerify === VERIFY_STATUS.NO) {
       await this.otpService.sendOtp(user.id, user.phone);
+      return new AuthByPhoneResponse(false, false);
     }
-    delete user.otpId;
-    return new LoginResponse(token, user);
+    const employee = await this.employeeService.findOwnerEmployee(user.id);
+    if (!employee) {
+      return new AuthByPhoneResponse(true, false);
+    }
+    return new AuthByPhoneResponse(true, true);
   }
 }

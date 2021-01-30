@@ -1,9 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class OtpDTO {
+export class SendOtpDTO {
   @ApiProperty({ example: '1234' })
-  readonly otp: string;
-
-  @ApiProperty({ example: '0962673471' })
   readonly phone: string;
 }
