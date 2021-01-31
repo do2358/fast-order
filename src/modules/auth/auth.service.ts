@@ -32,6 +32,7 @@ export class AuthService {
       AppException.throwBusinessException(ErrorCode.ERR_20101());
     }
     const user = await this.userService.findByPhone(authenRequest.phone);
+    console.log(user);
     if (!user) {
       const newUser = await this.userService.createByPhone(authenRequest.phone);
       await this.otpService.sendOtp(newUser.id, newUser.phone);
@@ -45,6 +46,7 @@ export class AuthService {
       return new AuthByPhoneResponse(false, false);
     }
     const employee = await this.employeeService.findOwnerEmployee(user.id);
+    console.log(employee);
     if (!employee) {
       return new AuthByPhoneResponse(true, false);
     }
@@ -87,6 +89,9 @@ export class AuthService {
   }
 
   async login(loginDTO: LoginDTO) {
+    if (!loginDTO.phone || !loginDTO.password) {
+      AppException.throwBusinessException(ErrorCode.ERR_10001());
+    }
     if (!validatePhone(loginDTO.phone)) {
       AppException.throwBusinessException(ErrorCode.ERR_20301());
     }

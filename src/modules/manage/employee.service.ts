@@ -51,10 +51,12 @@ export class EmployeeService {
         userId: userId,
         type: EmployeeRole.OWNER,
       });
-      delete employeeEntity.password;
-      delete employeeEntity.isDelete;
-      delete employeeEntity.fcmToken;
-      delete employeeEntity.deletedAt;
+      if (employeeEntity) {
+        delete employeeEntity.password;
+        delete employeeEntity.isDelete;
+        delete employeeEntity.fcmToken;
+        delete employeeEntity.deletedAt;
+      }
       return employeeEntity;
     } catch (error) {
       this.myLogger.error(error);

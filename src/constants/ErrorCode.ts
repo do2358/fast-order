@@ -21,7 +21,7 @@ export class ErrorCode {
   }
 
   public static ERR_10001() {
-    return { code: 10001, message: 'Lỗi HTTP' };
+    return { code: 10001, message: 'Vui lòng nhập đầu đủ thông tin' };
   }
   public static ERR_20101() {
     return { code: 20101, message: 'Số điện thoại nhập không đúng định dạng' };
